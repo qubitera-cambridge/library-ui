@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install tox
+      # Full, uncached regeneration — a clean checkout has no prior demo_cache
+      # to scope against. Add a <framework>-docs step for each SDK as
+      # library-core adds one.
+      - run: tox -e qiskit-docs
+      - run: tox -e docs

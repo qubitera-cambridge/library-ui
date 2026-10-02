@@ -1,0 +1,3 @@
+library-core @ git+https://github.com/qubitera-cambridge/library-core.git
+qiskit>=2
+qiskit-aer>=0.15

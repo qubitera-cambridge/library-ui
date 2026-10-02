@@ -1,0 +1,8 @@
+# Rendering needs only library-core's metadata/explanation access (never
+# imports an algorithm's actual implementation) plus templating/site tooling —
+# no quantum SDK belongs here. Demo generation (which does need an SDK) is a
+# separate step; see README.md.
+library-core @ git+https://github.com/qubitera-cambridge/library-core.git
+jinja2>=3
+mkdocs>=1.6
+mkdocs-material>=9

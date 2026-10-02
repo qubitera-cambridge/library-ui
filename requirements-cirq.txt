@@ -1,0 +1,4 @@
+# No Cirq algorithm exists in library-core yet — kept ready and tested for
+# when one does, mirroring library-core's own convention.
+library-core @ git+https://github.com/qubitera-cambridge/library-core.git
+cirq>=1.4
