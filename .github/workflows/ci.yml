@@ -18,3 +18,22 @@ jobs:
       # library-core adds one.
       - run: tox -e qiskit-docs
       - run: tox -e docs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  # Only deploy from main, not from PRs — a PR's build is verified above but
+  # shouldn't publish until it's merged.
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: build-site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
