@@ -41,6 +41,16 @@ def generate_for_framework(framework: str, only_ids: list[str] | None = None) ->
             print(f"skip (no demo()): {algo_id}")
             skipped += 1
             continue
+        except ImportError as error:
+            # demo() exists, but a package it needs isn't installed in this
+            # environment — e.g. an algorithm tagged framework=qiskit that
+            # also has an `external_dependencies` entry (a private sibling
+            # package) not installed here. Skip, don't crash the whole run:
+            # one algorithm's missing dependency shouldn't block every other
+            # algorithm's demo from being generated.
+            print(f"skip (demo() needs an unavailable package: {error}): {algo_id}")
+            skipped += 1
+            continue
 
         out_path = DEMO_CACHE_DIR / f"{algo_id}.json"
         with open(out_path, "w") as f:
@@ -48,7 +58,7 @@ def generate_for_framework(framework: str, only_ids: list[str] | None = None) ->
         print(f"generated: {algo_id} -> {out_path.relative_to(REPO_ROOT)}")
         generated += 1
 
-    print(f"\n{generated} demo(s) generated, {skipped} algorithm(s) skipped (no demo() yet)")
+    print(f"\n{generated} demo(s) generated, {skipped} algorithm(s) skipped")
     return 0
 
 
