@@ -6,3 +6,7 @@ library-core @ git+https://github.com/qubitera-cambridge/library-core.git
 jinja2>=3
 mkdocs>=1.6
 mkdocs-material>=9
+# Explicit (mkdocs-material already pulls this in transitively) because
+# mkdocs.yml's markdown_extensions directly configures
+# pymdownx.superfences's custom_fences for Mermaid rendering.
+pymdown-extensions>=10

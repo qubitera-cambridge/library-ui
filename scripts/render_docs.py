@@ -16,6 +16,7 @@ from pathlib import Path
 
 import jinja2
 import library_core
+from library_core.graph import build_dependency_graph
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = REPO_ROOT / "website" / "templates"
@@ -31,6 +32,13 @@ def render_site():
     )
     algorithm_template = env.get_template("algorithm.md.j2")
     index_template = env.get_template("index.md.j2")
+    graph_template = env.get_template("dependency_graph.md.j2")
+
+    # algorithm_dependencies, turned into a real graph object (see
+    # library_core.graph) for both the standalone dependency-graph page below
+    # and each algorithm page's own "Related algorithms" cross-links.
+    graph = build_dependency_graph()
+    nodes_by_id = {node.id: node for node in graph.nodes()}
 
     categories = {}
 
@@ -41,8 +49,16 @@ def render_site():
         demo_cache_path = DEMO_CACHE_DIR / f"{meta['id']}.json"
         demo = json.loads(demo_cache_path.read_text()) if demo_cache_path.exists() else None
 
+        dependencies = [nodes_by_id[d] for d in graph.dependencies_of(meta["id"])]
+        dependents = [nodes_by_id[d] for d in graph.dependents_of(meta["id"])]
+
         page = algorithm_template.render(
-            meta=meta, explanation=explanation, demo=demo, provenance=provenance
+            meta=meta,
+            explanation=explanation,
+            demo=demo,
+            provenance=provenance,
+            dependencies=dependencies,
+            dependents=dependents,
         )
 
         out_path = BUILD_DIR / meta["category"] / f"{meta['id']}.md"
@@ -56,6 +72,10 @@ def render_site():
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     (BUILD_DIR / "index.md").write_text(index_page)
     print(f"rendered: {(BUILD_DIR / 'index.md').relative_to(REPO_ROOT)}")
+
+    graph_page = graph_template.render(mermaid=graph.to_mermaid())
+    (BUILD_DIR / "dependency-graph.md").write_text(graph_page)
+    print(f"rendered: {(BUILD_DIR / 'dependency-graph.md').relative_to(REPO_ROOT)}")
 
     total = sum(len(v) for v in categories.values())
     print(f"\n{total} algorithm page(s) rendered across {len(categories)} categor(y/ies)")

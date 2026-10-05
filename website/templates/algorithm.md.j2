@@ -76,6 +76,25 @@ the bottom of this page for its source.*
 *None documented yet.*
 {% endif %}
 
+{% if dependencies or dependents %}
+## Related algorithms
+
+{% if dependencies %}
+**Builds on:**
+
+{% for dep in dependencies -%}
+- [{{ dep.name }}](../{{ dep.category }}/{{ dep.id }}.md)
+{% endfor %}
+{% endif %}
+{% if dependents %}
+**Used by:**
+
+{% for dep in dependents -%}
+- [{{ dep.name }}](../{{ dep.category }}/{{ dep.id }}.md)
+{% endfor %}
+{% endif %}
+
+{% endif %}
 ## References
 
 {% if meta.references %}
