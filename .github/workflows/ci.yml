@@ -13,6 +13,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install tox
+      # library-core is a separate private repo — now that library-ui is
+      # public, GITHUB_TOKEN no longer gets implicit cross-repo read access
+      # to it, so pip's git clone needs its own credential. This rewrite
+      # keeps the token out of requirements-*.txt (those stay plain https
+      # URLs, safe to commit) and scopes the credential to just this one
+      # clone via a read-only fine-grained PAT stored as a repo secret.
+      - run: git config --global url."https://x-access-token:${{ secrets.LIBRARY_CORE_TOKEN }}@github.com/qubitera-cambridge/library-core".insteadOf "https://github.com/qubitera-cambridge/library-core"
       # Full, uncached regeneration — a clean checkout has no prior demo_cache
       # to scope against. Add a <framework>-docs step for each SDK as
       # library-core adds one.
